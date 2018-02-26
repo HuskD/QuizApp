@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal">
+
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/quizCardView"
+        app:cardBackgroundColor="@color/colorPrimary"
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        android:layout_margin="5dp"
+        app:cardElevation="5dp">
+
+        <ImageView
+            android:id="@+id/cardBgImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:ignore="ContentDescription"/>
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+            <TextView
+                android:id="@+id/tytulQuizuId"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="8dp"
+                android:padding="5dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="15dp"
+                android:background="#BF000000"
+                android:fontFamily="casual"
+                android:text="Tytul Quizu"
+                android:textColor="#ffffff"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/opisQuizuId"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="#A6000000"
+                android:padding="5dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="8dp"
+                android:text="opis quizu"
+                android:textColor="#a0a0a0"
+                android:textSize="10sp"
+                android:textStyle="italic"
+                app:layout_constraintStart_toStartOf="@id/tytulQuizuId"
+                app:layout_constraintTop_toBottomOf="@+id/tytulQuizuId" />
+
+            <TextView
+                android:id="@+id/ostatniWynikProgressText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:layout_marginRight="24dp"
+                android:layout_marginLeft="8dp"
+                android:textColor="#BFffff"
+                android:background="#90000000"
+                android:padding="5dp"
+                android:layout_marginTop="45dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/idQuizuTextView" />
+
+            <TextView
+                android:id="@+id/kategoriaTextId"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="32dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="24dp"
+                android:padding="2dp"
+                android:background="#90000000"
+                android:text="KATEGORIA: DEFAULT"
+                android:textColor="#ffffff"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/opisQuizuId" />
+
+            <TextView
+                android:id="@+id/idQuizuTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="80dp"
+                android:layout_marginLeft="16dp"
+                android:text="id: DEFAULT"
+                android:textColor="#00FFFFFF"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent" />
+        </android.support.constraint.ConstraintLayout>
+
+
+
+    </android.support.v7.widget.CardView>
+</LinearLayout>

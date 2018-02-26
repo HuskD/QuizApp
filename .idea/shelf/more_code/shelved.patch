@@ -1,0 +1,81 @@
+Index: app/src/main/java/quizapp/staranapp/com/quizapp/allquizes/ChooseQuizActivity.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package quizapp.staranapp.com.quizapp.allquizes;\n\nimport android.os.AsyncTask;\nimport android.support.v7.app.AppCompatActivity;\nimport android.os.Bundle;\nimport android.support.v7.widget.LinearLayoutManager;\nimport android.support.v7.widget.RecyclerView;\nimport android.text.TextUtils;\nimport android.util.Log;\nimport android.widget.Toast;\n\nimport org.json.JSONArray;\nimport org.json.JSONException;\nimport org.json.JSONObject;\n\nimport java.io.IOException;\nimport java.util.ArrayList;\nimport java.util.List;\n\nimport okhttp3.OkHttpClient;\nimport okhttp3.Request;\nimport okhttp3.Response;\nimport quizapp.staranapp.com.quizapp.R;\nimport quizapp.staranapp.com.quizapp.data.AllQuizesGetter;\n\npublic class ChooseQuizActivity extends AppCompatActivity {\n    private RecyclerView mRecyclerView;\n    private RecyclerView.Adapter mAdapter;\n    private RecyclerView.LayoutManager mLayoutManager;\n    AllQuizesGetter allQuizesGetter;\n    List<QuizObject> quizy;\n\n    @Override\n    protected void onCreate(Bundle savedInstanceState) {\n        super.onCreate(savedInstanceState);\n        setContentView(R.layout.activity_main);\n\n        //get all quizes and load them\n        allQuizesGetter = new AllQuizesGetter(this);\n        //make db writeable\n        allQuizesGetter.getWritableDatabase();\n\n        if(allQuizesGetter.getAllStoredQuizes().size() == 0) {\n            allQuizesGetter.allQuizes();\n        }\n\n        quizy = allQuizesGetter.getAllStoredQuizes();\n\n        mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);\n        mAdapter = new QuizAdapter(quizy, ChooseQuizActivity.this);\n        mRecyclerView.setNestedScrollingEnabled(false);\n        mRecyclerView.setHasFixedSize(true);\n        mLayoutManager = new LinearLayoutManager(ChooseQuizActivity.this, LinearLayoutManager.VERTICAL, false);\n        mRecyclerView.setLayoutManager(mLayoutManager);\n        mRecyclerView.setAdapter(mAdapter);\n\n\n    }\n\n\n\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/quizapp/staranapp/com/quizapp/allquizes/ChooseQuizActivity.java	(revision ce250f5ae6ecb57af1a228e9284c955a464ffab9)
++++ app/src/main/java/quizapp/staranapp/com/quizapp/allquizes/ChooseQuizActivity.java	(revision )
+@@ -46,6 +46,10 @@
+ 
+         quizy = allQuizesGetter.getAllStoredQuizes();
+ 
++//        for(QuizObject q1 : quizy) {
++//            Log.e("info", String.valueOf(q1.getIdQuizu()));
++//        }
++
+         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+         mAdapter = new QuizAdapter(quizy, ChooseQuizActivity.this);
+         mRecyclerView.setNestedScrollingEnabled(false);
+Index: app/src/main/java/quizapp/staranapp/com/quizapp/data/AllQuizesGetter.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package quizapp.staranapp.com.quizapp.data;\n\nimport android.content.ContentValues;\nimport android.content.Context;\nimport android.database.Cursor;\nimport android.database.DatabaseErrorHandler;\nimport android.database.sqlite.SQLiteDatabase;\nimport android.database.sqlite.SQLiteOpenHelper;\nimport android.os.AsyncTask;\nimport android.text.TextUtils;\nimport android.util.Log;\nimport android.widget.Toast;\n\nimport org.json.JSONArray;\nimport org.json.JSONException;\nimport org.json.JSONObject;\n\nimport java.io.IOException;\nimport java.util.ArrayList;\nimport java.util.List;\n\nimport okhttp3.OkHttpClient;\nimport okhttp3.Request;\nimport okhttp3.Response;\nimport quizapp.staranapp.com.quizapp.allquizes.QuizObject;\n\n/**\n * Created by danie on 12.02.2018.\n */\n\npublic class AllQuizesGetter extends SQLiteOpenHelper {\n\n    private Context context;\n\n    ArrayList<QuizObject> quizObjectArrayList = new ArrayList<>();\n\n    //quiz list url\n    public static final String QUIZ_LIST_URL = \"http://quiz.o2.pl/api/v1/quizzes/0/100\";\n    //database name\n    public static final String DB_NAME = \"Quizy.db\";\n    //version of database\n    public static final int DB_VERSION = 3;\n    //Table name\n    public static final String TABLE_NAME = \"QUIZY\";\n    //Id of quiz\n    public static final String QID = \"_QID\";\n    //title of quiz\n    public static final String QUIZ_TITLE = \"TITLE\";\n    //quiz description\n    public static final String QUIZ_DESCRIPTION = \"DESCRIPTION\";\n    //quiz category\n    public static final String QUIZ_CATEGORY = \"CATEGORY\";\n    //create a table first column - quiz id, sec column - quiz title, third column - quiz description, fourth column - quiz category\n    public static final String CREATE_TABLE = \"CREATE TABLE \" + TABLE_NAME + \" ( \" + QID + \" INTEGER PRIMARY KEY AUTOINCREMENT , \" + QUIZ_TITLE + \" VARCHAR(255), \" + QUIZ_DESCRIPTION + \" VARCHAR(255), \" + QUIZ_CATEGORY + \" VARCHAR(255));\";\n    //drop table query\n    public static final String DROP_TABLE = \"DROP TABLE IF EXISTS \" + TABLE_NAME;\n\n\n\n\n    public AllQuizesGetter(Context context) {\n        super(context, DB_NAME, null, DB_VERSION);\n    }\n\n    @Override\n    public void onCreate(SQLiteDatabase sqLiteDatabase) {\n        //oncreate is called once\n        sqLiteDatabase.execSQL(CREATE_TABLE);\n\n\n    }\n\n    @Override\n    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {\n        //onupgrade will be called when we upgrade or increment our database version number\n        sqLiteDatabase.execSQL(DROP_TABLE);\n        onCreate(sqLiteDatabase);\n    }\n\n    public class DownloadTask extends AsyncTask<String, Void, String> {\n\n        @Override\n        protected String doInBackground(String... strings) {\n            return getAllQuizesData(strings[0]);\n        }\n\n        @Override\n        protected void onPreExecute() {\n            super.onPreExecute();\n        }\n\n        @Override\n        protected void onPostExecute(String json) {\n\n            if(TextUtils.isEmpty(json)) {\n                Log.i(\"Cannot retrieve\", \"data\");\n            }else {\n                try {\n                    JSONObject mainObject = new JSONObject(json);\n\n                    JSONArray jsonArray = mainObject.getJSONArray(\"items\");\n\n                    for(int i = 0; i < jsonArray.length(); i++) {\n                        JSONObject obj = jsonArray.getJSONObject(i);\n\n                        int idQuizu = obj.getInt(\"id\");\n                        String tytulQuizu = obj.getString(\"title\");\n                        String opisQuizu = obj.getString(\"content\");\n                        String kategoriaQuizu = obj.getJSONObject(\"category\").getString(\"name\");\n                        QuizObject quizObject = new QuizObject(idQuizu, tytulQuizu, opisQuizu, kategoriaQuizu);\n                        quizObjectArrayList.add(quizObject);\n                    }\n\n\n\n                    for(QuizObject quiz : quizObjectArrayList) {\n                        Log.e(\"INFO\", quiz.getOpisQuizu().toString());\n                    }\n\n\n                }catch (JSONException e) {\n                    e.printStackTrace();\n                }\n            }\n        }\n    }\n\n\n    public void allQuizes() {\n        DownloadTask downloadTask = new DownloadTask();\n        downloadTask.execute(QUIZ_LIST_URL);\n        this.addAllQuizes(quizObjectArrayList);\n    }\n\n    public String getAllQuizesData(String url) {\n\n\n        OkHttpClient okHttpClient = new OkHttpClient();\n        Request request = new Request.Builder()\n                .url(url)\n                .build();\n        Response response = null;\n        try{\n            response = okHttpClient.newCall(request).execute();\n            return response.body().string();\n        }catch (IOException e) {\n            e.printStackTrace();\n        }\n        return null;\n\n    }\n\n    private void addAllQuizes(ArrayList<QuizObject> allQuizes) {\n        SQLiteDatabase db = this.getWritableDatabase();\n        db.beginTransaction();\n        try{\n            ContentValues values = new ContentValues();\n            for (QuizObject quiz : allQuizes) {\n                values.put(QID, quiz.getIdQuizu());\n                values.put(QUIZ_TITLE, quiz.getTytulQuizu());\n                values.put(QUIZ_DESCRIPTION, quiz.getOpisQuizu());\n                values.put(QUIZ_CATEGORY, quiz.getKategoriaQuizu());\n                db.insert(TABLE_NAME, null, values);\n            }\n            db.setTransactionSuccessful();\n        }finally {\n            db.endTransaction();\n            db.close();\n        }\n    }\n\n    public List<QuizObject> getAllStoredQuizes() {\n\n        List<QuizObject> quizObjectList = new ArrayList<>();\n        SQLiteDatabase db = this.getWritableDatabase();\n        db.beginTransaction();\n        String[] column = {QID, QUIZ_TITLE, QUIZ_DESCRIPTION, QUIZ_CATEGORY};\n        Cursor c = db.query(TABLE_NAME, column, null, null, null, null, null);\n\n        while(c.moveToNext()) {\n            QuizObject quizObject = new QuizObject();\n            quizObject.setIdQuizu(c.getInt(0));\n            quizObject.setTytulQuizu(c.getString(1));\n            quizObject.setOpisQuizu(c.getString(2));\n            quizObject.setKategoriaQuizu(c.getString(3));\n            quizObjectList.add(quizObject);\n        }\n\n        db.setTransactionSuccessful();\n        db.endTransaction();\n        c.close();\n        db.close();\n        return quizObjectList;\n    }\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/quizapp/staranapp/com/quizapp/data/AllQuizesGetter.java	(revision ce250f5ae6ecb57af1a228e9284c955a464ffab9)
++++ app/src/main/java/quizapp/staranapp/com/quizapp/data/AllQuizesGetter.java	(revision )
+@@ -113,9 +113,9 @@
+ 
+ 
+ 
+-                    for(QuizObject quiz : quizObjectArrayList) {
+-                        Log.e("INFO", quiz.getOpisQuizu().toString());
+-                    }
++//                    for(QuizObject quiz : quizObjectArrayList) {
++//                        Log.e("INFO", quiz.getOpisQuizu().toString());
++//                    }
+ 
+ 
+                 }catch (JSONException e) {
+Index: app/src/main/res/layout/item_quiz.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"utf-8\"?>\n<LinearLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\n    xmlns:tools=\"http://schemas.android.com/tools\"\n    android:layout_width=\"match_parent\"\n    android:layout_height=\"wrap_content\"\n    xmlns:app=\"http://schemas.android.com/apk/res-auto\"\n    android:orientation=\"horizontal\">\n\n\n    <android.support.v7.widget.CardView\n        android:id=\"@+id/quizCardView\"\n        android:layout_width=\"match_parent\"\n        android:layout_height=\"180dp\"\n        app:cardElevation=\"5dp\">\n\n        <android.support.constraint.ConstraintLayout\n            android:layout_width=\"match_parent\"\n            android:layout_height=\"match_parent\">\n\n\n            <TextView\n                android:id=\"@+id/tytulQuizuId\"\n                android:layout_width=\"wrap_content\"\n                android:layout_height=\"wrap_content\"\n                android:layout_marginLeft=\"24dp\"\n                android:layout_marginTop=\"95dp\"\n                android:text=\"Tytul Quizu\"\n                android:textSize=\"20sp\"\n                app:layout_constraintLeft_toLeftOf=\"parent\"\n                app:layout_constraintTop_toTopOf=\"parent\" />\n\n            <TextView\n                android:id=\"@+id/opisQuizuId\"\n                android:layout_width=\"wrap_content\"\n                android:layout_height=\"wrap_content\"\n                android:layout_marginLeft=\"30dp\"\n                android:layout_marginTop=\"8dp\"\n                android:background=\"#66FFFFFF\"\n                android:padding=\"5dp\"\n                android:text=\"opis quizu\"\n                android:textColor=\"#000000\"\n                android:textSize=\"11sp\"\n                android:textStyle=\"italic\"\n                app:layout_constraintStart_toStartOf=\"parent\"\n                app:layout_constraintTop_toBottomOf=\"@+id/tytulQuizuId\" />\n\n            <TextView\n                android:id=\"@+id/kategoriaTextId\"\n                android:layout_width=\"wrap_content\"\n                android:layout_height=\"wrap_content\"\n                android:layout_marginEnd=\"16dp\"\n                android:layout_marginTop=\"16dp\"\n                android:text=\"KATEGORIA: DEFAULT\"\n                app:layout_constraintEnd_toEndOf=\"parent\"\n                app:layout_constraintTop_toTopOf=\"parent\" />\n        </android.support.constraint.ConstraintLayout>\n\n\n\n    </android.support.v7.widget.CardView>\n</LinearLayout>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/layout/item_quiz.xml	(revision ce250f5ae6ecb57af1a228e9284c955a464ffab9)
++++ app/src/main/res/layout/item_quiz.xml	(revision )
+@@ -48,7 +48,7 @@
+                 android:id="@+id/kategoriaTextId"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+-                android:layout_marginEnd="16dp"
++                android:layout_marginRight="16dp"
+                 android:layout_marginTop="16dp"
+                 android:text="KATEGORIA: DEFAULT"
+                 app:layout_constraintEnd_toEndOf="parent"
+Index: app/src/main/java/quizapp/staranapp/com/quizapp/allquizes/QuizAdapter.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package quizapp.staranapp.com.quizapp.allquizes;\n\nimport android.content.Context;\nimport android.support.v7.widget.RecyclerView;\nimport android.view.LayoutInflater;\nimport android.view.View;\nimport android.view.ViewGroup;\n\nimport java.util.List;\n\nimport quizapp.staranapp.com.quizapp.R;\n\n/**\n * Created by danie on 10.02.2018.\n */\n\npublic class QuizAdapter extends RecyclerView.Adapter<QuizViewsHolder> {\n    private List<QuizObject> quizList;\n    private Context context;\n\n\n    public QuizAdapter(List<QuizObject> quizList, Context context) {\n        this.quizList = quizList;\n        this.context = context;\n    }\n\n    @Override\n    public QuizViewsHolder onCreateViewHolder(ViewGroup parent, int viewType) {\n\n        View layoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_quiz, parent, false);\n\n\n        return new QuizViewsHolder(layoutView);\n    }\n\n    @Override\n    public void onBindViewHolder(QuizViewsHolder holder, int position) {\n\n        holder.opisQuizu.setText(quizList.get(position).getOpisQuizu());\n        holder.tytulQuizu.setText(quizList.get(position).getTytulQuizu());\n        holder.kategoriaQuizu.setText(quizList.get(position).getKategoriaQuizu());\n\n    }\n\n    @Override\n    public int getItemCount() {\n        return this.quizList.size();\n    }\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/quizapp/staranapp/com/quizapp/allquizes/QuizAdapter.java	(revision ce250f5ae6ecb57af1a228e9284c955a464ffab9)
++++ app/src/main/java/quizapp/staranapp/com/quizapp/allquizes/QuizAdapter.java	(revision )
+@@ -36,9 +36,10 @@
+     @Override
+     public void onBindViewHolder(QuizViewsHolder holder, int position) {
+ 
++      //  holder.idQuizu.setText(String.valueOf(quizList.get(position).getIdQuizu()));
+         holder.opisQuizu.setText(quizList.get(position).getOpisQuizu());
+         holder.tytulQuizu.setText(quizList.get(position).getTytulQuizu());
+-        holder.kategoriaQuizu.setText(quizList.get(position).getKategoriaQuizu());
++        holder.kategoriaQuizu.setText("Kategoria: " + quizList.get(position).getKategoriaQuizu());
+ 
+     }
+ 
